@@ -1,3 +1,4 @@
+#  お金がかかるので、lambdaはまだ使わない
 import json
 
 def lambda_handler(event, context):
