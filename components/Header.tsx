@@ -1,7 +1,7 @@
 interface HeaderProps {
     // ユーザのログイン状態(boolean)
     isLoggedIn: boolean;
-    // ユーザ名（String)
+    // ユーザ名（string)
     userName?: string;
 }
 
