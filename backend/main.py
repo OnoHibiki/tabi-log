@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from database import get_db_connection 
 
 app = FastAPI()
@@ -13,6 +14,11 @@ app.add_middleware(
     allow_methods = ["*"],
     allow_headers = ["*"],
 )
+
+class TravelLogCreate(BaseModel):
+    title: str
+    location: str
+    notes: str
 
 @app.get("/")
 def read_root():
@@ -44,3 +50,19 @@ def get_travel_logs():
         ]
 
     return logs
+
+@app.post("/api/logs")
+def create_travel_log(log: TravelLogCreate):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO travel_logs (title, location, notes) VALUES (?, ?, ?)",
+        (log.title, log.location, log.notes)
+    )
+    conn.commit()
+
+    new_id = cursor.lastrowid
+    conn.close()
+
+    return{"id": new_id, "message": "記録を保存しました"}
