@@ -3,6 +3,7 @@
 import { useState , useEffect } from 'react';
 import Header from "@/components/Header";
 import ActionCard from "@/components/ActionCard";
+import NewLogForm from '@/components/NewLogForm';
 
 // データの型
 interface TravelLog {
@@ -21,7 +22,7 @@ export default function Home() {
 
     const [logs, setLogs] = useState<TravelLog[]>([]);
 
-    useEffect(() => {
+    const fetchLogs = () => {
         fetch("http://localhost:8000/api/logs")
             .then((res) => res.json())
             .then((data) => {
@@ -30,6 +31,10 @@ export default function Home() {
         .catch((error) => {
             console.error("API Error",error);
         });    
+    };
+
+    useEffect(() => {
+        fetchLogs();
     },[]);
 
     return (
@@ -45,6 +50,8 @@ export default function Home() {
                 </h1>
 
                 <ActionCard isLoggedIn={isUserLoggedIn} userName={currentUserName} />
+
+                <NewLogForm onLogAdded={fetchLogs} />
 
                 <div className = "mt-9 w-full max-w-4xl">
                     <h2 className='text-2xl font-bold mb-6 text-gray-700 border-b pb-2'>
