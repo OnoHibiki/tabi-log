@@ -16,7 +16,7 @@ interface TravelLog {
 
 export default function Home() {
 
-    // 　仮のログインデータ（開発中）
+    // 　仮のログインデータ
     const isUserLoggedIn = true;//trueでログイン状態、falseで未ログイン状態
     const currentUserName = "HibikiOno"
 
@@ -37,6 +37,25 @@ export default function Home() {
         fetchLogs();
     },[]);
 
+    const handleDelete = async(id: number) => {
+        if(!confirm("この記録を削除してもよろしいですか？"))return;
+
+    try {
+        const response = await fetch('http://localhost:8000/api/logs/${id}',{
+            method: "DELETE",
+        });
+
+        if (response.ok) {
+            fetchLogs();
+        } else {
+            alert("削除に失敗しました");
+        }
+    } catch (error) {
+        console.error("Delete Error:", error);
+    }
+};
+    
+
     return (
         <main className="min-h-screen font-sans ">
             
@@ -44,7 +63,7 @@ export default function Home() {
             <Header isLoggedIn={isUserLoggedIn} userName={currentUserName} />
 
             {/* コンテンツ */}
-            <div className="flex flex-col items-center p-8 text-center">
+            <div className="flex flex-col items-center p-1 text-center">
                 <h1 className="text-4xl font-extrabold m-8 text-gray-800">
                     Tabi-Log
                 </h1>
@@ -58,12 +77,18 @@ export default function Home() {
                         最近の記録
                     </h2>
 
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-50'>
                         {logs.map((log) => (
-                            
-                            <div key={log.id} className='bg-white p-6 rounded-xl shadow-sm transition border border-gray-100'>
+
+                            <div key={log.id} className='bg-white p-6 rounded-xl shadow-sm transition border border-gray-10 relative'>
+
+                                <button onClick={() => handleDelete(log.id)}
+                                className='absolute text-xl right-3 cursor-pointer top-7.5'
+                                title='削除'>
+                                    🗑️
+                                </button>
                                 
-                                <div className='flex justify-between items-start mb-2'>
+                                <div className='flex justify-between items-start mb-2 pr-5'>
                                     <h3 className='text-xl font-bold text-gray-800'>
                                         {log.title}
                                     </h3>

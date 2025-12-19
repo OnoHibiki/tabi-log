@@ -66,3 +66,15 @@ def create_travel_log(log: TravelLogCreate):
     conn.close()
 
     return{"id": new_id, "message": "記録を保存しました"}
+
+@app.delete("/api/logs/{log_id}")
+def delete_travel_log(log_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM travel_logs WHERE id = ?", (log_id,))
+
+    conn.commit()
+    conn.close()
+
+    return {"message": f"ID{log_id}の記録を削除しました"}
