@@ -21,6 +21,8 @@ export default function Home() {
     const currentUserName = "HibikiOno"
 
     const [logs, setLogs] = useState<TravelLog[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const fetchLogs = () => {
         fetch("http://localhost:8000/api/logs")
@@ -41,12 +43,13 @@ export default function Home() {
         if(!confirm("この記録を削除してもよろしいですか？"))return;
 
     try {
-        const response = await fetch('http://localhost:8000/api/logs/${id}',{
+        const response = await fetch(`http://localhost:8000/api/logs/${id}`,{
             method: "DELETE",
         });
 
         if (response.ok) {
             fetchLogs();
+            alert("削除しました");
         } else {
             alert("削除に失敗しました");
         }
@@ -83,7 +86,7 @@ export default function Home() {
                             <div key={log.id} className='bg-white p-6 rounded-xl shadow-sm transition border border-gray-10 relative'>
 
                                 <button onClick={() => handleDelete(log.id)}
-                                className='absolute text-xl right-3 cursor-pointer top-7.5'
+                                className='absolute text-xl right-3 cursor-pointer top-7'
                                 title='削除'>
                                     🗑️
                                 </button>
