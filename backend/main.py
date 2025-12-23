@@ -1,6 +1,8 @@
 # AWSはお金がかかるため、一旦FastAPI
-
-from fastapi import FastAPI
+import shutil
+import uuid
+import os
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -55,20 +57,46 @@ def get_travel_logs():
     return logs
 
 @app.post("/api/logs")
-def create_travel_log(log: TravelLogCreate):
+async def create_travel_log(
+    title: str = Form(...),
+    location: str = Form(...),
+    notes: str = Form(...),
+    image: UploadFile = File(None) # 画像は必須ではない（NoneでもOK）
+):
+    """
+    画像付きで旅の記録をデータベースに保存する
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    image_filename = None
 
+    # 画像が送られてきた場合の処理
+    if image:
+        # 1. ファイル名が被らないようにユニークなIDをつける
+        # (例: "550e8400-e29b..._photo.jpg")
+        filename = f"{uuid.uuid4()}_{image.filename}"
+        
+        # 2. 保存先のパスを決める
+        file_location = f"static/{filename}"
+        
+        # 3. ファイルを実際に保存する
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(image.file, file_object)
+            
+        # データベース保存用にファイル名を記録
+        image_filename = filename
+
+    # データをINSERT（画像ファイル名も追加）
     cursor.execute(
-        "INSERT INTO travel_logs (title, location, notes) VALUES (?, ?, ?)",
-        (log.title, log.location, log.notes)
+        "INSERT INTO travel_logs (title, location, notes, image_filename) VALUES (?, ?, ?, ?)",
+        (title, location, notes, image_filename)
     )
     conn.commit()
-
     new_id = cursor.lastrowid
     conn.close()
-
-    return{"id": new_id, "message": "記録を保存しました"}
+    
+    return {"id": new_id, "message": "記録を保存しました！"}
 
 @app.delete("/api/logs/{log_id}")
 def delete_travel_log(log_id: int):

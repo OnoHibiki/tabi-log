@@ -18,6 +18,7 @@ def initialize_db():
                 title TEXT NOT NULL,
                 location TEXT,
                 notes TEXT,
+                image_filename Text,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
     """)
