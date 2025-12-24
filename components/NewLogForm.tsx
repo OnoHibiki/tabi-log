@@ -11,6 +11,7 @@ export default function NewLogForm({ onLogAdded }: Props){
     const [title, setTitle] = useState("");
     const [location, setLocation] = useState("");
     const [notes, setNotes] = useState("");
+    const [file, setFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
 
@@ -18,28 +19,37 @@ export default function NewLogForm({ onLogAdded }: Props){
         e.preventDefault();
         setIsSubmitting(true);
 
-        try {
-            const response = await fetch("http://localhost:8000/api/logs",{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title: title,
-                    location: location,
-                    notes: notes,   
-                }),
-            });
+        try{
+          const formData = new FormData();
+          formData.append("title", title);
+          formData.append("location", location);
+          formData.append("notes", notes);
+
+          if(file){
+            formData.append("image", file);
+          }
+
+          const response = await fetch("http://localhost:8000/api/logs",{
+            method:"POST",
+            body: formData,
+          });
 
             if(response.ok){
-                setTitle("");
-                setLocation("");
-                setNotes("");
+              setTitle("");
+              setLocation("");
+              setNotes("");
+              setFile(null);
+
+              const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+              if(fileInput){
+                fileInput.value = "";
                 onLogAdded();
+              }
+
             } else {
                 alert("保存に失敗しました...")
             }
-            
         } catch(error) {
             console.error("Error:", error);
             alert("エラーが発生しました");
@@ -78,6 +88,20 @@ return (
           />
         </div>
       </div>
+
+      {/* 写真 */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          写真を選択
+        </label>
+        <input 
+          type="file" 
+          accept="image/*"
+          onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+        />
+      </div>
+
 
       {/* メモ入力 */}
       <div className="mb-4">

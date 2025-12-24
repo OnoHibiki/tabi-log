@@ -11,6 +11,7 @@ interface TravelLog {
     title: string;
     location: string;
     notes: string;
+    image_filename?: string; 
     created_at: string;
 }
 
@@ -99,6 +100,16 @@ export default function Home() {
                                         {log.location}
                                     </span>
                                 </div>
+
+                                {log.image_filename && (
+                                    <div className="mb-4 rounded-lg overflow-hidden">
+                                        <img
+                                            src={`http://localhost:8000/static/${log.image_filename}`}
+                                            alt={log.title}
+                                            className='w-full h-48 object-cover hover:scale-105 transition duration-300'
+                                        />
+                                    </div>
+                                )}
 
                                 <p className='text-left mt-3  text-sm mb-4 line-clamp-3'>
                                     {log.notes}

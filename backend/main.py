@@ -51,7 +51,6 @@ def get_travel_logs():
     if not logs:
         return[
             {"id": 1, "title": "【ダミー】京都食べ歩き","location": "京都", "notes": "抹茶スイーツを堪能。清水寺の紅葉が最高でした!", "created_at": "2025-11-01T10:00:00" },
-            {"id": 2, "title": "【ダミー】システム設計合宿", "location": "箱根", "notes": "アーキテクチャ設計について議論。温泉でリフレッシュ！", "created_at": "2025-10-20T15:30:00"},
         ]
 
     return logs
