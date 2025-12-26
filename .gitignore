@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 画像は保持しない
+backend/static/*
+!backend/static/.gitkeep

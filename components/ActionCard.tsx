@@ -1,42 +1,26 @@
 import { FC } from 'react';
 
-interface ActionCardProps {
-    isLoggedIn: boolean;
-    userName?: string;
-}
+// Props（引数）はもう不要です！
+const ActionCard: FC = () => {
+    
+    return(
+        <div className='w-full p-6 max-w-2xl mx-auto bg-gradient-to-r from-indigo-50 to-green-50 rounded-xl shadow-sm border border-indigo-100 text-center '>
+            <h2 className='text-2xl font-bold text-gray-800 mb-3'>
+                🤖 AIと一緒に、旅を詠む。
+            </h2>
 
+            <p className='text-gray-600 font-sans leading-relaxed'>
+                旅の写真をアップロードするだけで、<br />
+                AIアシスタントがその瞬間の情景を読み取り、<br />
+                <span className="font-bold text-indigo-600">世界に一つだけの「俳句」</span>を作成します。
+            </p>
+            
+            <p className="mt-4 text-xs text-gray-900">
+                👇 下のフォームから、今日の思い出を記録してみましょう
+            </p>
 
-const ActionCard: FC<ActionCardProps> =  ({ isLoggedIn, userName }) => {
-    const displayUserName = userName ?? "ゲスト";
-
-    if (isLoggedIn) {
-        return(
-            <div className='p-5 max-w-lg mx-auto bg-green-50 rounded-xl shadow-lg space-y-4'>
-                <h2 className='text-2xl font-semibold text-green-700'>
-                    ようこそ、{displayUserName} さん！
-                </h2>
-            </div>
-        );
-    } else {
-        return(
-            <div className='p-8 max-w-lg mx-auto bg-green-50 rounded-xl shadow-lg space-y-4'>
-
-                <p className='text-gray-600 font-sans'>
-                    ログインして、AIによる自動タグ付け機能を体験しませんか？
-                </p>
-
-                <div className='flex space-x-4 justify-center'>
-                    <button className='bg-indigo-500 font-semibold text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150 cursor-pointer'>
-                        ログイン
-                    </button>
-                    <button className='border bg-red-100 text-black font-semibold py-2 px-4 rounded-lg hover:bg-indigo-50 transition duration-150 cursor-pointer'>
-                        新規登録
-                    </button>
-                </div>
-
-            </div>
-        );
-    };
+        </div>
+    );
 };
 
 export default ActionCard;

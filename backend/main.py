@@ -8,6 +8,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from database import get_db_connection 
 
+from google import genai
+from PIL import Image
+
+from dotenv import load_dotenv
+load_dotenv()
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -19,6 +25,10 @@ app.add_middleware(
     allow_methods = ["*"],
     allow_headers = ["*"],
 )
+
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
 class TravelLogCreate(BaseModel):
     title: str
@@ -41,16 +51,13 @@ def read_hello():
 @app.get("/api/logs")
 def get_travel_logs():
     conn = get_db_connection()
-
     logs_cursor = conn.execute('SELECT * FROM travel_logs ORDER BY created_at DESC').fetchall()
-
     logs = [dict(log) for log in logs_cursor]
-
     conn.close()
 
     if not logs:
         return[
-            {"id": 1, "title": "【ダミー】京都食べ歩き","location": "京都", "notes": "抹茶スイーツを堪能。清水寺の紅葉が最高でした!", "created_at": "2025-11-01T10:00:00" },
+           {"id": 1, "title": "まだない","location":  "まだない", "notes": "まだない!", "created_at": "2025-11-01T10:00:00" },
         ]
 
     return logs
@@ -69,6 +76,7 @@ async def create_travel_log(
     cursor = conn.cursor()
     
     image_filename = None
+    ai_comment = None
 
     # 画像が送られてきた場合の処理
     if image:
@@ -86,10 +94,40 @@ async def create_travel_log(
         # データベース保存用にファイル名を記録
         image_filename = filename
 
+        try:
+            print("AIが画像を分析中...")
+
+            pil_image = Image.open(file_location)
+
+            prompt = f"""
+            あなたはこの旅の参加者です。
+            この写真と、ユーザのメモ「{title}」,「{location}」「{notes}」をもとに、
+            5、7、5のいい感じの俳句（川柳）を作成してください。
+            
+            そのあと、その俳句の補足や情景描写を短く解説してください。
+
+            【重要】出力フォーマットは厳密に以下を守ってください：
+            
+            俳句テキスト
+            ---SPLIT---
+            解説テキスト
+            """
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=[prompt, pil_image]
+            )
+            
+            ai_comment = response.text.strip()
+            print(f"AI俳句: {ai_comment}")
+        
+        except Exception as e :
+            print(f"AIエラー！:{e}")
+            ai_comment = "AI俳句の生成に失敗しました..."
+
     # データをINSERT（画像ファイル名も追加）
     cursor.execute(
-        "INSERT INTO travel_logs (title, location, notes, image_filename) VALUES (?, ?, ?, ?)",
-        (title, location, notes, image_filename)
+        "INSERT INTO travel_logs (title, location, notes, image_filename, ai_comment) VALUES (?, ?, ?, ?, ?)",
+        (title, location, notes, image_filename, ai_comment)
     )
     conn.commit()
     new_id = cursor.lastrowid

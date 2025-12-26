@@ -1,34 +1,24 @@
-interface HeaderProps {
-    // ユーザのログイン状態(boolean)
-    isLoggedIn: boolean;
-    // ユーザ名（string)
-    userName?: string;
-}
+// components/Header.tsx
 
-
-export default function Header({ isLoggedIn, userName }: HeaderProps) {
-
-    // ログイン状態に応じて、ボタンの中身を切り替える
-    const buttonContents = isLoggedIn ? (
-        //ログイン済の場合
-        <p className="text-black py-2 px-4">ようこそ、{userName}さん</p>
-    ):(
-        //未ログインの場合
-        <button className="bg-indigo-500 cursor-pointer text-white  py-2 px-4 rounded-lg hover:bg-indigo-600 transition duration-150">
-            ログイン
-        </button>
-    )
+export default function Header() {
+    // Props（引数）も、ログイン判定のロジックも全部不要です！
+    // いきなり return してOKです。
 
     return (
         <header className="w-full border-b bg-stone-50 border-gray-200 p-4">
             <nav className="flex items-center justify-between max-w-7xl mx-auto">
-                {/* サービス名 */}
-                <div className="text-2xl font-bold text-indigo-600">
-                    Tabi-Log
+                {/* 左側：サービス名 */}
+                <div className="flex items-center gap-2">
+                    <span className="text-2xl">✈️</span>
+                    <div className="text-2xl font-bold text-indigo-600">
+                        Tabi-Log
+                    </div>
                 </div>
 
-                {/* ログインボタン */}
-                {buttonContents}
+                {/* 右側：ログインボタンの代わりにサブタイトルを表示 */}
+                <div className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    AI Travel Diary
+                </div>
 
             </nav>
         </header>

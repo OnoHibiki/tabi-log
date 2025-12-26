@@ -13,16 +13,13 @@ interface TravelLog {
     notes: string;
     image_filename?: string; 
     created_at: string;
+    ai_comment?: string;
 }
 
 export default function Home() {
 
-    // 　仮のログインデータ
-    const isUserLoggedIn = true;//trueでログイン状態、falseで未ログイン状態
-    const currentUserName = "HibikiOno"
 
     const [logs, setLogs] = useState<TravelLog[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
 
     const fetchLogs = () => {
@@ -64,15 +61,12 @@ export default function Home() {
         <main className="min-h-screen font-sans ">
             
             {/* ヘッダーコンポーネントを引数渡して呼び出し */}
-            <Header isLoggedIn={isUserLoggedIn} userName={currentUserName} />
+            <Header />
 
             {/* コンテンツ */}
             <div className="flex flex-col items-center p-1 text-center">
-                <h1 className="text-4xl font-extrabold m-8 text-gray-800">
-                    Tabi-Log
-                </h1>
-
-                <ActionCard isLoggedIn={isUserLoggedIn} userName={currentUserName} />
+            
+                <ActionCard />
 
                 <NewLogForm onLogAdded={fetchLogs} />
 
@@ -81,7 +75,7 @@ export default function Home() {
                         最近の記録
                     </h2>
 
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-50'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-5'>
                         {logs.map((log) => (
 
                             <div key={log.id} className='bg-white p-6 rounded-xl shadow-sm transition border border-gray-10 relative'>
@@ -108,6 +102,41 @@ export default function Home() {
                                             alt={log.title}
                                             className='w-full h-48 object-cover hover:scale-105 transition duration-300'
                                         />
+                                    </div>
+                                )}
+
+                                {log.ai_comment && (
+                                    <div className="mb-4 bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="text-xl">🤖</span>
+                                            <p className="text-xs font-bold text-indigo-600">AI旅人による一句</p>
+                                        </div>
+
+                                        {(() => {
+                                            const parts = log.ai_comment.split('---SPLIT---');
+                                            const haiku = parts[0];
+                                            const explanation = parts[1] || ""; // 解説がない場合の保険
+
+                                            return (
+                                                <div>
+                                                    
+                                                    <div className="text-center my-4">
+                                                        <p className="text-xl font-bold text-gray-800 font-serif leading-loose tracking-widest">
+                                                            {haiku}
+                                                        </p>
+                                                    </div>
+
+                                                    {explanation && (
+                                                        <div className="mt-4 pt-3 border-t border-indigo-200">
+                                                            <p className="text-sm text-indigo-800 leading-relaxed">
+                                                                <span className="font-bold">解説：</span>
+                                                                {explanation}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 )}
 

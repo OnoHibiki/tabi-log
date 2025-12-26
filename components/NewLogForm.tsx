@@ -6,14 +6,12 @@ interface Props {
     onLogAdded: () => void;
 }
 
-
 export default function NewLogForm({ onLogAdded }: Props){
     const [title, setTitle] = useState("");
     const [location, setLocation] = useState("");
     const [notes, setNotes] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
 
     const handleSubmit = async (e:React.FormEvent) => {
         e.preventDefault();
@@ -35,17 +33,18 @@ export default function NewLogForm({ onLogAdded }: Props){
           });
 
             if(response.ok){
+              // フォームをクリア
               setTitle("");
               setLocation("");
               setNotes("");
               setFile(null);
+              
 
               const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+              if(fileInput) fileInput.value = "";
+              
 
-              if(fileInput){
-                fileInput.value = "";
-                onLogAdded();
-              }
+              onLogAdded(); 
 
             } else {
                 alert("保存に失敗しました...")
@@ -59,8 +58,16 @@ export default function NewLogForm({ onLogAdded }: Props){
     };
 
 return (
-    <form onSubmit={handleSubmit} className="bg-white m-6 p-6 rounded-xl shadow-md border border-gray-200  w-full max-w-2xl">
-      <h3 className="text-lg font-bold text-gray-700 mb-2">🖊️ 新しい旅を記録する</h3>
+    <form onSubmit={handleSubmit} className="bg-white m-6 p-6 rounded-xl shadow-md border border-gray-200 w-full max-w-2xl">
+
+      <div className="mb-6 border-b pb-2 border-gray-100">
+        <h3 className="text-xl font-bold text-gray-800">
+            AI俳句名人、準備万端...
+        </h3>
+        <p className="text-s text-gray-500 mt-1">
+            旅の情報や、写真をアップロードすると、AIが情景を読み取って一句詠みます
+        </p>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* タイトル入力 */}
@@ -71,7 +78,7 @@ return (
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="例: 京都旅行"
           />
         </div>
@@ -83,7 +90,7 @@ return (
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
             placeholder="例: 京都府京都市"
           />
         </div>
@@ -91,37 +98,49 @@ return (
 
       {/* 写真 */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          写真を選択
+        <label className="block text-sm  text-gray-700 mb-1 font-bold">
+          ~ 写真を選択 ~ <span className="text-red-500 text-xs ml-1">(AI俳句に必須)</span>
         </label>
         <input 
           type="file" 
           accept="image/*"
           onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer"
         />
       </div>
 
 
       {/* メモ入力 */}
-      <div className="mb-4">
+      <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">思い出メモ</label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
-          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
           placeholder="楽しかったこと、美味しかったもの..."
         />
       </div>
 
-      {/* 送信ボタン */}
+      {/* 送信ボタン：メッセージを魅力的に */}
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600 transition disabled:opacity-50"
+        className={`w-full font-bold py-3 px-4 rounded-lg transition duration-200 flex justify-center items-center gap-2
+            ${isSubmitting 
+                ? "bg-gray-400 cursor-not-allowed" 
+                : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl"
+            }`}
       >
-        {isSubmitting ? "送信中..." : "記録を保存"}
+        {isSubmitting ? (
+            <>
+               <span>🤖</span> AIが俳句を詠んでいます...
+            </>
+        ) : (
+            <>
+               <span>✨</span> 記録してAI俳句を作成
+            </>
+        )}
       </button>
     </form>
   );
